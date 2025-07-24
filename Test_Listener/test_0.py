@@ -5,7 +5,8 @@
 # SPDX-License-Identifier: GPL-3.0
 #
 # GNU Radio Python Flow Graph
-# Title: Not titled yet
+# Title: Listener for RFID system
+# Author: yuri
 # GNU Radio version: 3.8.5.0
 
 from distutils.version import StrictVersion
@@ -24,6 +25,7 @@ from PyQt5 import Qt
 from gnuradio import qtgui
 from gnuradio.filter import firdes
 import sip
+from gnuradio import blocks
 from gnuradio import filter
 from gnuradio import gr
 import sys
@@ -40,9 +42,9 @@ from gnuradio import qtgui
 class test_0(gr.top_block, Qt.QWidget):
 
     def __init__(self):
-        gr.top_block.__init__(self, "Not titled yet")
+        gr.top_block.__init__(self, "Listener for RFID system")
         Qt.QWidget.__init__(self)
-        self.setWindowTitle("Not titled yet")
+        self.setWindowTitle("Listener for RFID system")
         qtgui.util.check_set_qss()
         try:
             self.setWindowIcon(Qt.QIcon.fromTheme('gnuradio-grc'))
@@ -73,31 +75,33 @@ class test_0(gr.top_block, Qt.QWidget):
         ##################################################
         # Variables
         ##################################################
-        self.samp_rate = samp_rate = 2000000
+        self.samp_rate = samp_rate = 800000
+        self.Cen_f = Cen_f = 910250000
 
         ##################################################
         # Blocks
         ##################################################
         self.rfid_tag_decoder_0 = rfid.tag_decoder(samp_rate)
+        self.rfid_reader_0 = rfid.reader(2000000, 2000000)
         self.rfid_gate_0 = rfid.gate(samp_rate)
-        self.qtgui_time_sink_x_0_1_0 = qtgui.time_sink_c(
-            1024, #size
+        self.qtgui_time_sink_x_1 = qtgui.time_sink_c(
+            1000000, #size
             samp_rate, #samp_rate
-            "out 2", #name
+            "", #name
             1 #number of inputs
         )
-        self.qtgui_time_sink_x_0_1_0.set_update_time(0.10)
-        self.qtgui_time_sink_x_0_1_0.set_y_axis(-1, 1)
+        self.qtgui_time_sink_x_1.set_update_time(0.10)
+        self.qtgui_time_sink_x_1.set_y_axis(-1, 1)
 
-        self.qtgui_time_sink_x_0_1_0.set_y_label('Amplitude', "")
+        self.qtgui_time_sink_x_1.set_y_label('Amplitude', "")
 
-        self.qtgui_time_sink_x_0_1_0.enable_tags(True)
-        self.qtgui_time_sink_x_0_1_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, 0, "")
-        self.qtgui_time_sink_x_0_1_0.enable_autoscale(False)
-        self.qtgui_time_sink_x_0_1_0.enable_grid(False)
-        self.qtgui_time_sink_x_0_1_0.enable_axis_labels(True)
-        self.qtgui_time_sink_x_0_1_0.enable_control_panel(False)
-        self.qtgui_time_sink_x_0_1_0.enable_stem_plot(False)
+        self.qtgui_time_sink_x_1.enable_tags(True)
+        self.qtgui_time_sink_x_1.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, 0, "")
+        self.qtgui_time_sink_x_1.enable_autoscale(False)
+        self.qtgui_time_sink_x_1.enable_grid(False)
+        self.qtgui_time_sink_x_1.enable_axis_labels(True)
+        self.qtgui_time_sink_x_1.enable_control_panel(False)
+        self.qtgui_time_sink_x_1.enable_stem_plot(False)
 
 
         labels = ['Signal 1', 'Signal 2', 'Signal 3', 'Signal 4', 'Signal 5',
@@ -117,80 +121,33 @@ class test_0(gr.top_block, Qt.QWidget):
         for i in range(2):
             if len(labels[i]) == 0:
                 if (i % 2 == 0):
-                    self.qtgui_time_sink_x_0_1_0.set_line_label(i, "Re{{Data {0}}}".format(i/2))
+                    self.qtgui_time_sink_x_1.set_line_label(i, "Re{{Data {0}}}".format(i/2))
                 else:
-                    self.qtgui_time_sink_x_0_1_0.set_line_label(i, "Im{{Data {0}}}".format(i/2))
+                    self.qtgui_time_sink_x_1.set_line_label(i, "Im{{Data {0}}}".format(i/2))
             else:
-                self.qtgui_time_sink_x_0_1_0.set_line_label(i, labels[i])
-            self.qtgui_time_sink_x_0_1_0.set_line_width(i, widths[i])
-            self.qtgui_time_sink_x_0_1_0.set_line_color(i, colors[i])
-            self.qtgui_time_sink_x_0_1_0.set_line_style(i, styles[i])
-            self.qtgui_time_sink_x_0_1_0.set_line_marker(i, markers[i])
-            self.qtgui_time_sink_x_0_1_0.set_line_alpha(i, alphas[i])
+                self.qtgui_time_sink_x_1.set_line_label(i, labels[i])
+            self.qtgui_time_sink_x_1.set_line_width(i, widths[i])
+            self.qtgui_time_sink_x_1.set_line_color(i, colors[i])
+            self.qtgui_time_sink_x_1.set_line_style(i, styles[i])
+            self.qtgui_time_sink_x_1.set_line_marker(i, markers[i])
+            self.qtgui_time_sink_x_1.set_line_alpha(i, alphas[i])
 
-        self._qtgui_time_sink_x_0_1_0_win = sip.wrapinstance(self.qtgui_time_sink_x_0_1_0.pyqwidget(), Qt.QWidget)
-        self.top_layout.addWidget(self._qtgui_time_sink_x_0_1_0_win)
-        self.qtgui_time_sink_x_0_1 = qtgui.time_sink_f(
-            1024, #size
-            samp_rate, #samp_rate
-            "out 1", #name
-            1 #number of inputs
-        )
-        self.qtgui_time_sink_x_0_1.set_update_time(0.10)
-        self.qtgui_time_sink_x_0_1.set_y_axis(-1, 1)
-
-        self.qtgui_time_sink_x_0_1.set_y_label('Amplitude', "")
-
-        self.qtgui_time_sink_x_0_1.enable_tags(True)
-        self.qtgui_time_sink_x_0_1.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, 0, "")
-        self.qtgui_time_sink_x_0_1.enable_autoscale(False)
-        self.qtgui_time_sink_x_0_1.enable_grid(False)
-        self.qtgui_time_sink_x_0_1.enable_axis_labels(True)
-        self.qtgui_time_sink_x_0_1.enable_control_panel(False)
-        self.qtgui_time_sink_x_0_1.enable_stem_plot(False)
-
-
-        labels = ['Signal 1', 'Signal 2', 'Signal 3', 'Signal 4', 'Signal 5',
-            'Signal 6', 'Signal 7', 'Signal 8', 'Signal 9', 'Signal 10']
-        widths = [1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1]
-        colors = ['blue', 'red', 'green', 'black', 'cyan',
-            'magenta', 'yellow', 'dark red', 'dark green', 'dark blue']
-        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0, 1.0, 1.0]
-        styles = [1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1]
-        markers = [-1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1]
-
-
-        for i in range(1):
-            if len(labels[i]) == 0:
-                self.qtgui_time_sink_x_0_1.set_line_label(i, "Data {0}".format(i))
-            else:
-                self.qtgui_time_sink_x_0_1.set_line_label(i, labels[i])
-            self.qtgui_time_sink_x_0_1.set_line_width(i, widths[i])
-            self.qtgui_time_sink_x_0_1.set_line_color(i, colors[i])
-            self.qtgui_time_sink_x_0_1.set_line_style(i, styles[i])
-            self.qtgui_time_sink_x_0_1.set_line_marker(i, markers[i])
-            self.qtgui_time_sink_x_0_1.set_line_alpha(i, alphas[i])
-
-        self._qtgui_time_sink_x_0_1_win = sip.wrapinstance(self.qtgui_time_sink_x_0_1.pyqwidget(), Qt.QWidget)
-        self.top_layout.addWidget(self._qtgui_time_sink_x_0_1_win)
+        self._qtgui_time_sink_x_1_win = sip.wrapinstance(self.qtgui_time_sink_x_1.pyqwidget(), Qt.QWidget)
+        self.top_layout.addWidget(self._qtgui_time_sink_x_1_win)
         self.qtgui_time_sink_x_0_0 = qtgui.time_sink_c(
-            1024, #size
+            1000000, #size
             samp_rate, #samp_rate
-            "after LPF", #name
+            "after FIR filter", #name
             1 #number of inputs
         )
-        self.qtgui_time_sink_x_0_0.set_update_time(0.10)
+        self.qtgui_time_sink_x_0_0.set_update_time(0.5)
         self.qtgui_time_sink_x_0_0.set_y_axis(-1, 1)
 
         self.qtgui_time_sink_x_0_0.set_y_label('Amplitude', "")
 
         self.qtgui_time_sink_x_0_0.enable_tags(True)
         self.qtgui_time_sink_x_0_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, 0, "")
-        self.qtgui_time_sink_x_0_0.enable_autoscale(False)
+        self.qtgui_time_sink_x_0_0.enable_autoscale(True)
         self.qtgui_time_sink_x_0_0.enable_grid(False)
         self.qtgui_time_sink_x_0_0.enable_axis_labels(True)
         self.qtgui_time_sink_x_0_0.enable_control_panel(False)
@@ -227,8 +184,8 @@ class test_0(gr.top_block, Qt.QWidget):
 
         self._qtgui_time_sink_x_0_0_win = sip.wrapinstance(self.qtgui_time_sink_x_0_0.pyqwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._qtgui_time_sink_x_0_0_win)
-        self.qtgui_time_sink_x_0 = qtgui.time_sink_c(
-            1024, #size
+        self.qtgui_time_sink_x_0 = qtgui.time_sink_f(
+            1000000, #size
             samp_rate, #samp_rate
             "after gate", #name
             1 #number of inputs
@@ -261,12 +218,9 @@ class test_0(gr.top_block, Qt.QWidget):
             -1, -1, -1, -1, -1]
 
 
-        for i in range(2):
+        for i in range(1):
             if len(labels[i]) == 0:
-                if (i % 2 == 0):
-                    self.qtgui_time_sink_x_0.set_line_label(i, "Re{{Data {0}}}".format(i/2))
-                else:
-                    self.qtgui_time_sink_x_0.set_line_label(i, "Im{{Data {0}}}".format(i/2))
+                self.qtgui_time_sink_x_0.set_line_label(i, "Data {0}".format(i))
             else:
                 self.qtgui_time_sink_x_0.set_line_label(i, labels[i])
             self.qtgui_time_sink_x_0.set_line_width(i, widths[i])
@@ -282,7 +236,7 @@ class test_0(gr.top_block, Qt.QWidget):
             firdes.WIN_BLACKMAN_hARRIS, #wintype
             0, #fc
             samp_rate, #bw
-            "fre after lpf", #name
+            "fre ori", #name
             1
         )
         self.qtgui_freq_sink_x_0.set_update_time(0.10)
@@ -322,35 +276,38 @@ class test_0(gr.top_block, Qt.QWidget):
         )
         self.osmosdr_source_0.set_time_unknown_pps(osmosdr.time_spec_t())
         self.osmosdr_source_0.set_sample_rate(samp_rate)
-        self.osmosdr_source_0.set_center_freq(920375000, 0)
+        self.osmosdr_source_0.set_center_freq(Cen_f, 0)
         self.osmosdr_source_0.set_freq_corr(0, 0)
         self.osmosdr_source_0.set_gain(14, 0)
         self.osmosdr_source_0.set_if_gain(30, 0)
         self.osmosdr_source_0.set_bb_gain(30, 0)
         self.osmosdr_source_0.set_antenna('', 0)
         self.osmosdr_source_0.set_bandwidth(0, 0)
-        self.low_pass_filter_0 = filter.fir_filter_ccf(
-            1,
-            firdes.low_pass(
-                1,
-                samp_rate,
-                250000,
-                50000,
-                firdes.WIN_HAMMING,
-                6.76))
+        self.fir_filter_xxx_0 = filter.fir_filter_ccc(5, [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,])
+        self.fir_filter_xxx_0.declare_sample_delay(0)
+        self.blocks_null_sink_1 = blocks.null_sink(gr.sizeof_float*1)
+        self.blocks_file_sink_1 = blocks.file_sink(gr.sizeof_gr_complex*1, '/home/yu/gr-rfid/examples/gate_test', False)
+        self.blocks_file_sink_1.set_unbuffered(False)
+        self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_gr_complex*1, '/home/yu/gr-rfid/Test_Listener/decoded_data', False)
+        self.blocks_file_sink_0.set_unbuffered(False)
+        self.blocks_complex_to_mag_0 = blocks.complex_to_mag(1)
 
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.low_pass_filter_0, 0), (self.qtgui_freq_sink_x_0, 0))
-        self.connect((self.low_pass_filter_0, 0), (self.qtgui_time_sink_x_0_0, 0))
-        self.connect((self.low_pass_filter_0, 0), (self.rfid_gate_0, 0))
-        self.connect((self.osmosdr_source_0, 0), (self.low_pass_filter_0, 0))
-        self.connect((self.rfid_gate_0, 0), (self.qtgui_time_sink_x_0, 0))
+        self.connect((self.blocks_complex_to_mag_0, 0), (self.qtgui_time_sink_x_0, 0))
+        self.connect((self.fir_filter_xxx_0, 0), (self.qtgui_time_sink_x_0_0, 0))
+        self.connect((self.fir_filter_xxx_0, 0), (self.rfid_gate_0, 0))
+        self.connect((self.osmosdr_source_0, 0), (self.fir_filter_xxx_0, 0))
+        self.connect((self.osmosdr_source_0, 0), (self.qtgui_freq_sink_x_0, 0))
+        self.connect((self.rfid_gate_0, 0), (self.blocks_complex_to_mag_0, 0))
+        self.connect((self.rfid_gate_0, 0), (self.blocks_file_sink_1, 0))
+        self.connect((self.rfid_gate_0, 0), (self.qtgui_time_sink_x_1, 0))
         self.connect((self.rfid_gate_0, 0), (self.rfid_tag_decoder_0, 0))
-        self.connect((self.rfid_tag_decoder_0, 0), (self.qtgui_time_sink_x_0_1, 0))
-        self.connect((self.rfid_tag_decoder_0, 1), (self.qtgui_time_sink_x_0_1_0, 0))
+        self.connect((self.rfid_reader_0, 0), (self.blocks_null_sink_1, 0))
+        self.connect((self.rfid_tag_decoder_0, 1), (self.blocks_file_sink_0, 0))
+        self.connect((self.rfid_tag_decoder_0, 0), (self.rfid_reader_0, 0))
 
 
     def closeEvent(self, event):
@@ -363,13 +320,18 @@ class test_0(gr.top_block, Qt.QWidget):
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
-        self.low_pass_filter_0.set_taps(firdes.low_pass(1, self.samp_rate, 250000, 50000, firdes.WIN_HAMMING, 6.76))
         self.osmosdr_source_0.set_sample_rate(self.samp_rate)
         self.qtgui_freq_sink_x_0.set_frequency_range(0, self.samp_rate)
         self.qtgui_time_sink_x_0.set_samp_rate(self.samp_rate)
         self.qtgui_time_sink_x_0_0.set_samp_rate(self.samp_rate)
-        self.qtgui_time_sink_x_0_1.set_samp_rate(self.samp_rate)
-        self.qtgui_time_sink_x_0_1_0.set_samp_rate(self.samp_rate)
+        self.qtgui_time_sink_x_1.set_samp_rate(self.samp_rate)
+
+    def get_Cen_f(self):
+        return self.Cen_f
+
+    def set_Cen_f(self, Cen_f):
+        self.Cen_f = Cen_f
+        self.osmosdr_source_0.set_center_freq(self.Cen_f, 0)
 
 
 
